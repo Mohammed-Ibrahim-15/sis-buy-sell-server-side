@@ -72,6 +72,19 @@ async function run() {
             res.send(bookings)
         })
 
+        app.get('/users', async (req, res) => {
+            let query = {}
+
+            if (req.query.role) {
+                query = {
+                    role: req.query.role
+                }
+            }
+
+            const users = await usersCollection.find(query).toArray();
+            res.send(users)
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body;
             const result = await usersCollection.insertOne(user)
