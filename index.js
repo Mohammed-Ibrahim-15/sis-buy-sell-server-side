@@ -41,6 +41,19 @@ async function run() {
         const bookingsCollection = client.db('sisBuySell').collection('bookings');
         const usersCollection = client.db('sisBuySell').collection('users');
 
+        const verifyAdmin = async (req, res, next) => {
+            const decodedEmail = req.decoded.email;
+            const query = { email: decodedEmail };
+            const user = await usersCollection.findOne(query);
+
+            if (user?.role !== 'Admin') {
+                return res.status(403).send({ message: 'forbidden access' })
+            }
+            next();
+        }
+
+
+
         app.get('/categories', async (req, res) => {
             let query = {};
             if (req.query.category) {
@@ -65,6 +78,14 @@ async function run() {
             const result = await categoriesCollection.insertOne(addProduct)
             res.send(result);
         })
+
+        app.delete('/categories/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await categoriesCollection.deleteOne(filter);
+            res.send(result)
+        })
+
 
         app.post('/bookings', async (req, res) => {
             const booking = req.body
@@ -104,6 +125,13 @@ async function run() {
             const result = await usersCollection.insertOne(user)
             res.send(result);
 
+        })
+
+        app.delete('/users/:id', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result)
         })
 
         app.get('/users/admin/:email', async (req, res) => {
