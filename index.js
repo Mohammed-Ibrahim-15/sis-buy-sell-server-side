@@ -52,6 +52,13 @@ async function run() {
             res.send(options)
         })
 
+        app.post('/categories', async (req, res) => {
+            const addProduct = req.body.data
+            console.log(addProduct)
+            const result = await categoriesCollection.insertOne(addProduct)
+            res.send(result);
+        })
+
         app.post('/bookings', async (req, res) => {
             const booking = req.body
             // console.log(booking)
