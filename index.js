@@ -48,13 +48,20 @@ async function run() {
                     category: req.query.category
                 }
             }
+
+            if (req.query.seller_name) {
+                query = {
+                    seller_name: req.query.seller_name
+                }
+            }
+
             const options = await categoriesCollection.find(query).toArray()
             res.send(options)
         })
 
         app.post('/categories', async (req, res) => {
-            const addProduct = req.body.data
-            console.log(addProduct)
+            const addProduct = req.body
+            // console.log(addProduct)
             const result = await categoriesCollection.insertOne(addProduct)
             res.send(result);
         })
@@ -113,18 +120,18 @@ async function run() {
             res.send({ isSeller: user?.role === 'Seller' })
         })
 
-        app.put('/users/admin/:id', async (req, res) => {
-            const id = req.params.id;
-            const filter = { _id: ObjectId(id) }
-            const options = { upsert: true }
-            const updatedDoc = {
-                $set: {
-                    role: 'Admin'
-                }
-            }
-            const result = await usersCollection.updateOne(filter, updatedDoc, options);
-            res.send(result)
-        })
+        // app.put('/users/admin/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     const filter = { _id: ObjectId(id) }
+        //     const options = { upsert: true }
+        //     const updatedDoc = {
+        //         $set: {
+        //             role: 'Admin'
+        //         }
+        //     }
+        //     const result = await usersCollection.updateOne(filter, updatedDoc, options);
+        //     res.send(result)
+        // })
 
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
@@ -137,10 +144,6 @@ async function run() {
 
             res.status(403).send({ accessToken: '' })
         })
-
-
-
-
 
     }
     finally {
